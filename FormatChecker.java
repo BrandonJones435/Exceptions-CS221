@@ -62,7 +62,7 @@ public class FormatChecker {
         // Use a try-catch block to handle any exceptions that occur during file processing
         try (Scanner scanner = new Scanner(new File(filename))) {
             // 1. Read the first two tokens as integers: row count and column count
-            if (!scanner.hasNextInt()) {
+            if (!scanner.hasNext()) {
                 throw new Exception("Missing or invalid row count");
             }
             int numRows = scanner.nextInt();
@@ -71,20 +71,20 @@ public class FormatChecker {
                 throw new Exception("Missing or invalid column count");
             }
             int numCols = scanner.nextInt();
-            
+
+            // Check to see if there is another element on the same line 
+            String remainingLine = scanner.nextLine();
+
+            if (!remainingLine.isEmpty()) {
+                throw new Exception("File should not have a third parameter");
+            }
             // Check that the numbers are positive
             if (numRows <= 0 || numCols <= 0) {
                 throw new Exception("Row and column counts must be positive");
             }
             
-            // 2. Process the grid rows
+            // Process the grid rows
             int rowsRead = 0;
-            
-            // It may help to read the rest of the line after reading the two integers.
-            // (This is especially useful if there are extra spaces.)
-            if (scanner.hasNextLine()) {
-                scanner.nextLine(); // Move to the next line after the first line
-            }
             
             // Read exactly numRows lines (ignoring completely empty lines, if any)
             while (scanner.hasNextLine() && rowsRead < numRows) {
@@ -110,12 +110,12 @@ public class FormatChecker {
                 rowsRead++;
             }
             
-            // 3. Check that we have read exactly numRows rows
+            // Check that we have read exactly numRows rows
             if (rowsRead != numRows) {
                 throw new Exception("Expected " + numRows + " rows but found " + rowsRead);
             }
             
-            // 4. Check for any extra data beyond the expected grid.
+            // Check for any extra data beyond the expected grid.
             // If there is any additional token after the expected rows, that is an error.
             if (scanner.hasNext()) {
                 throw new Exception("Extra data after expected grid");
@@ -146,3 +146,6 @@ public class FormatChecker {
         return false;
     }
 }
+
+// Command to run all of the tests once FormatChecker.java is compiled 
+// java FormatChecker invalid1.dat invalid2.dat invalid3.dat invalid4.dat invalid5.dat invalid6.dat invalid7.dat valid1.dat valid2.dat valid3.dat
